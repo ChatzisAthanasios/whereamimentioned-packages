@@ -1,0 +1,54 @@
+{
+  "name": "@whereamimentioned/api-client",
+  "version": "0.1.1",
+  "description": "Typed client and wire contract for the whereamimentioned public API (/api/v1) and the no-account site tools (/api/site).",
+  "keywords": [
+    "ai-visibility",
+    "geo",
+    "aeo",
+    "llm",
+    "brand-monitoring",
+    "api-client"
+  ],
+  "homepage": "https://whereamimentioned.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChatzisAthanasios/whereamimentioned-packages.git",
+    "directory": "packages/api-client"
+  },
+  "bugs": {
+    "url": "https://github.com/ChatzisAthanasios/whereamimentioned-packages/issues"
+  },
+  "license": "UNLICENSED",
+  "author": "whereamimentioned",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "5.9.3"
+  }
+}

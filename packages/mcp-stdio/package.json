@@ -1,0 +1,48 @@
+{
+  "name": "@whereamimentioned/mcp",
+  "version": "0.1.1",
+  "description": "stdio bridge to the hosted whereamimentioned MCP server, for clients that cannot add a remote URL.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "ai-visibility",
+    "geo",
+    "aeo",
+    "brand-monitoring"
+  ],
+  "homepage": "https://whereamimentioned.com/docs/mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChatzisAthanasios/whereamimentioned-packages.git",
+    "directory": "packages/mcp-stdio"
+  },
+  "bugs": {
+    "url": "https://github.com/ChatzisAthanasios/whereamimentioned-packages/issues"
+  },
+  "license": "UNLICENSED",
+  "author": "whereamimentioned",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "bin": {
+    "wam-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "5.9.3"
+  }
+}

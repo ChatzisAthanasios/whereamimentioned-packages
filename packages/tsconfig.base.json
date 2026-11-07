@@ -1,0 +1,19 @@
+{
+  "$comment": "The compiler options the three packages share. Inside packages/ on purpose: the public mirror (10-CLI section 10.2) carries packages/** and not the app's root tsconfig.json, so the packages must typecheck and build from what is in here. Mirror the root's strictness; never reach back to it.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "ES2022"],
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node"],
+    "paths": {
+      "@whereamimentioned/api-client": ["./api-client/src/index.ts"]
+    }
+  }
+}

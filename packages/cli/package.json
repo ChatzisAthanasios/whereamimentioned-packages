@@ -1,0 +1,59 @@
+{
+  "name": "@whereamimentioned/cli",
+  "version": "0.1.1",
+  "description": "Track and score your brand's visibility in AI answers, from the terminal and from CI.",
+  "keywords": [
+    "ai-visibility",
+    "geo",
+    "aeo",
+    "seo",
+    "llm",
+    "brand-monitoring",
+    "cli"
+  ],
+  "homepage": "https://whereamimentioned.com/docs/cli",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChatzisAthanasios/whereamimentioned-packages.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/ChatzisAthanasios/whereamimentioned-packages/issues"
+  },
+  "license": "UNLICENSED",
+  "author": "whereamimentioned",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "bin": {
+    "wam": "./dist/index.js",
+    "wamctl": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@whereamimentioned/api-client": "workspace:*",
+    "commander": "14.0.2",
+    "@clack/prompts": "^1.7.0",
+    "@napi-rs/keyring": "^1.3.0",
+    "@bomb.sh/tab": "^0.0.17",
+    "update-notifier": "^7.3.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "5.9.3"
+  }
+}

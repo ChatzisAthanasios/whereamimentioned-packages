@@ -1,0 +1,87 @@
+# .github/workflows/release-cli.yml (authored HERE, RUNS IN THE MIRROR; 10-CLI section 10.3)
+#
+# This file is copied into ChatzisAthanasios/whereamimentioned-packages by
+# sync-packages-mirror.yml and runs there, on the cli-v* tag the sync carries across. It is
+# never edited in the mirror: the next sync would overwrite it.
+#
+# npm trusted publishing over OIDC: the mirror is registered as the trusted publisher on
+# npmjs.com (repo plus this workflow filename plus the npm-publish environment), so there is no
+# registry secret anywhere in this pipeline. publishConfig.provenance on each package plus
+# `id-token: write` attaches the SLSA provenance automatically.
+#
+# One `pnpm changeset publish` for all three packages (api-client, cli, mcp). Changesets skips
+# any package whose current version is already on the registry, so a re-run after a partial
+# failure no-ops cleanly instead of failing on a duplicate version.
+#
+# Node 24, not 22: `pnpm changeset publish` ends in `pnpm publish`, and pnpm 10 hands the actual
+# upload to the `npm` binary on PATH (its run_npm helper; pnpm 10.10 has no OIDC code of its own).
+# Trusted publishing needs npm CLI 11.5.1 or later on Node 22.14 or later. Node 22 ships npm 10.9,
+# which cannot mint the OIDC token, so the publish step would stop with ENEEDAUTH. Node 24 ships
+# npm 11. The version line below prints all three so a future bump is visible in the log.
+#
+# The first version of each package (0.1.0) is published by hand from the owner machine, because
+# npmjs.com only lets a trusted publisher be configured on a package that already exists. This
+# workflow publishes from the next version on; on a cli-v0.1.0 tag it still runs, finds every
+# version already on the registry, and only produces the GitHub Release and the attestation.
+name: Release CLI
+
+on:
+  push:
+    tags: ["cli-v*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm-publish        # protected environment, required reviewers
+    permissions:
+      id-token: write               # OIDC for trusted publishing and attestations
+      contents: write               # GitHub Release
+      attestations: write
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24          # bundled npm >= 11.5.1, which trusted publishing needs (see the header)
+          registry-url: https://registry.npmjs.org
+
+      - run: node --version && npm --version && pnpm --version
+      - run: pnpm install --frozen-lockfile
+      # The mirror carries packages/** and nothing else, so these two cover the three packages
+      # only. The app's own typecheck, tests and lint are a gate on the TAG, in the private repo,
+      # before the sync ever runs. See the notes below.
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm --filter @whereamimentioned/api-client build
+      - run: pnpm --filter @whereamimentioned/cli build
+      - run: pnpm --filter @whereamimentioned/mcp build
+
+      # Smoke test the built artefact before it can ever reach the registry.
+      - run: node packages/cli/dist/index.js --version
+      - run: node packages/cli/dist/index.js site check-crawlers https://whereamimentioned.com --json > /dev/null
+
+      # One publish for all three packages. changeset publish skips any package whose current
+      # version is already on the registry, so a re-run after a partial failure no-ops cleanly
+      # instead of failing on a duplicate version. See section 10.2.
+      - name: Publish api-client, cli and mcp
+        run: pnpm changeset publish --no-git-tag
+
+      # `pnpm -C packages/cli pack`, not `pnpm --filter ... pack`: a filter puts pnpm 10 in
+      # recursive mode, and `pack` is not a recursive command ("Unknown option: 'recursive'"),
+      # which would fail this job AFTER the publish step above had already shipped the packages.
+      # The destination is absolute because the command runs inside packages/cli: a relative one
+      # would land in packages/cli/dist-release and the `cd` below would fail.
+      - name: Pack a tarball for the release and checksum it
+        run: |
+          pnpm -C packages/cli pack --pack-destination "${GITHUB_WORKSPACE}/dist-release"
+          cd dist-release && sha256sum *.tgz > SHA256SUMS
+
+      - uses: actions/attest@v4
+        with:
+          subject-path: dist-release/*.tgz
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist-release/*.tgz
+            dist-release/SHA256SUMS
